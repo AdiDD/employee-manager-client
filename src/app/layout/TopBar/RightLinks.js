@@ -48,11 +48,17 @@ const RightLinks = () => {
                 {/* begin::User */}
                 <div className="d-flex align-items-center me-n3 ms-1 ms-lg-3" id="kt_header_user_menu_toggle">
                     {/* begin::Menu wrapper */}
-                    <div className="btn btn-icon btn-active-light-primary w-30px h-30px w-md-40px h-md-40px" data-kt-menu-trigger="click" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end" onClick={() => setMenuOpen(prevState => !prevState)}>
+                    <div className="btn btn-icon btn-active-light-primary w-30px h-30px w-md-40px h-md-40px" data-kt-menu-trigger="click" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end" onClick={() => {
+                        setMenuOpen(prevState => !prevState);
+                        document.getElementById('root').classList.add("noScroll");
+                    }}>
                         <img className="h-30px w-30px rounded" src={ProfileImg} alt="" />
                     </div>
                     {/* begin::Menu */}
-                    {menuOpen && <RightLinksMenu closeMenu={() => setMenuOpen(false)} />}
+                    {menuOpen && <RightLinksMenu closeMenu={() => {
+                        setMenuOpen(false); 
+                        document.getElementById('root').classList.remove("noScroll");
+                        }} />}
                     {/* end::Menu */}
                     {/* end::Menu wrapper */}
                 </div>
