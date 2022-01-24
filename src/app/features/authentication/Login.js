@@ -6,6 +6,7 @@ import agent from "../../api/agent";
 import UserContext from "../../context/user-context";
 import LoadingButton from "../../layout/appComponents/LoadingButton";
 import GoogleSignIn from "./GoogleLogin";
+import GoogleLogin from 'react-google-login';
 
 const Login = () => {
 	const userCtx = useContext(UserContext);
@@ -20,14 +21,14 @@ const Login = () => {
 		if (userCtx.user)
 			history.push("/");
 
-		window.gapi.signin2.render('g-signin2', {
-			'scope': 'https://www.googleapis.com/auth/plus.login',
-			'width': 200,
-			'height': 50,
-			'longtitle': true,
-			'theme': 'dark',
-			'onsuccess': onSignIn
-		})
+		// window.gapi.signin2.render('g-signin2', {
+		// 	'scope': 'https://www.googleapis.com/auth/plus.login',
+		// 	'width': 200,
+		// 	'height': 50,
+		// 	'longtitle': true,
+		// 	'theme': 'dark',
+		// 	'onsuccess': onSignIn
+		// })
 	}, [userCtx, history]);
 
 	const handleInputChange = (event) => {
@@ -54,6 +55,30 @@ const Login = () => {
 		console.log('Image URL: ' + profile.getImageUrl());
 		console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
 	}
+
+	const handleFailure = (result) => {
+		alert(result);
+	};
+
+	const handleLogin = async (googleData) => {
+		const googleUser = googleData.profileObj;
+		console.log(googleUser);
+
+		let loginDto = {
+			email: googleUser.email,
+			password: ""
+		}
+
+		agent.Account.loginGoogle(loginDto)
+			.then(user => {
+				userCtx.saveUser(user);
+				history.push("/");
+			})
+			.catch(error => console.log(error))
+			.finally(() => setIsSubmitting(false));
+		// localStorage.setItem('loginData', JSON.stringify(data));
+		// history.push("/");
+	};
 
 	return (
 		<div className="d-flex flex-column flex-root mt-20">
@@ -89,9 +114,9 @@ const Login = () => {
 								/>
 							</div>
 							<div className="text-center">
-								{/* <LoadingButton classes="btn-lg w-100 mb-5" isSubmitting={isSubmitting}>Continue</LoadingButton>
+								<LoadingButton classes="btn-lg w-100 mb-5" isSubmitting={isSubmitting}>Continue</LoadingButton>
 								<div className="text-center text-muted text-uppercase fw-bolder mb-5">or</div>
-								<Link to="/" className="btn btn-flex flex-center btn-light btn-lg w-100 mb-5">
+								{/* <Link to="/" className="btn btn-flex flex-center btn-light btn-lg w-100 mb-5">
 									<img alt="Logo" src={GoogleLogo} className="h-20px me-3" />Continue with Google</Link> */}
 
 								{/* <div className="g-signin2" data-onsuccess={onSignIn} >
@@ -100,7 +125,16 @@ const Login = () => {
 
 							</div>
 						</form>
-						<GoogleSignIn />
+						<GoogleLogin
+							clientId="594593542565-attv3f3phm683g2m7qo92blqr7ghncvu.apps.googleusercontent.com"
+							// render={renderProps => (
+							//     <button onClick={responseGoogle} disabled={renderProps.disabled}>This is my custom Google button</button>
+							// )}
+							buttonText="Login"
+							onSuccess={handleLogin}
+							onFailure={handleFailure}
+							cookiePolicy={'single_host_origin'}
+						/>
 					</div>
 				</div>
 			</div>

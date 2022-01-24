@@ -10,9 +10,13 @@ const responseBody = response => response.data;
 
 axios.interceptors.request.use(config => {
     const userString = localStorage.getItem('user');
+    const googleString = localStorage.getItem('loginData');
     let token = null;
     if (userString) {
         token = JSON.parse(userString).token;
+    }
+    else if (googleString) {
+        token = JSON.parse(googleString).token;
     }
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
@@ -57,6 +61,8 @@ const Account = {
     changeMyPassword: payload => requests.put("account/change-my-password", payload),
     sendResetPasswordLink: payload => requests.post("account/request-reset-password", payload),
     resetPassword: payload => requests.post("account/reset-password", payload),
+
+    loginGoogle: values => requests.post("account/signin-google", values)
 }
 
 const Users = {
